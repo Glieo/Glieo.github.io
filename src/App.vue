@@ -7,6 +7,9 @@ import SkyOcean from "./components/SkyOcean.vue";
 </template>
 
 <style>
+body {
+  margin: 8px;
+}
 #app {
   font-family: Caslon, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
