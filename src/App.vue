@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import SkyOcean from "./components/SkyOcean.vue";
+import ThreeWebgl from "./components/ThreeWebgl.vue";
 </script>
 
 <template>
-  <SkyOcean />
+  <ThreeWebgl />
 </template>
 
 <style>
