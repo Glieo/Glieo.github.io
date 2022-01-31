@@ -3,13 +3,13 @@ import { onMounted } from "vue";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { init_SkyOcean } from "./SkyOcean";
-import { GPUComputationRenderer } from "three/examples/jsm/misc/GPUComputationRenderer.js";
+import { init_Birds } from "./Birds";
 
 let renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
   camera: THREE.PerspectiveCamera,
   controls;
-let animate_SkyOcean: { (): void; (): void; };
+let animate_SkyOcean: () => void, animate_Birds: () => void;
 
 onMounted(() => {
   init();
@@ -32,20 +32,24 @@ function init() {
     1,
     20000
   );
-  camera.position.set(0, 70, 100);
+  camera.position.set(0, 30, 100);
   // controls
   controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, 50, 0);
   controls.minDistance = 40.0;
   controls.maxDistance = 200.0;
   controls.update();
-  // init_SkyOcean
+
   animate_SkyOcean = init_SkyOcean(scene, renderer);
+  animate_Birds = init_Birds(scene, renderer);
 }
 
 function animate() {
   requestAnimationFrame(animate);
+
   animate_SkyOcean();
+  animate_Birds();
+
   renderer.render(scene, camera);
 }
 
