@@ -10,7 +10,13 @@ let windowHalfX = window.innerWidth / 2;
 let windowHalfY = window.innerHeight / 2;
 let last = performance.now();
 let gpuCompute: GPUComputationRenderer;
-let birdUniforms,
+let birdUniforms: {
+    color: { value: THREE.Color };
+    texturePosition: { value: THREE.Texture | null };
+    textureVelocity: { value: THREE.Texture | null };
+    time: { value: number };
+    delta: { value: number };
+  },
   velocityVariable: Variable,
   positionVariable: Variable,
   positionUniforms: { [x: string]: THREE.IUniform<any> },
@@ -285,29 +291,16 @@ class BirdGeometry extends THREE.BufferGeometry {
     const triangles = BIRDS * trianglesPerBird;
     const points = triangles * 3;
 
-    const vertices = new THREE.BufferAttribute(new Float32Array(points * 3), 3);
-    const birdColors = new THREE.BufferAttribute(
-      new Float32Array(points * 3),
-      3
-    );
-    const references = new THREE.BufferAttribute(
-      new Float32Array(points * 2),
-      2
-    );
-    const birdVertex = new THREE.BufferAttribute(new Float32Array(points), 1);
-
-    this.setAttribute("position", vertices);
-    this.setAttribute("birdColor", birdColors);
-    this.setAttribute("reference", references);
-    this.setAttribute("birdVertex", birdVertex);
-
-    // this.setAttribute( 'normal', new Float32Array( points * 3 ), 3 );
+    const vertices_array = new Float32Array(points * 3);
+    const birdColors_array = new Float32Array(points * 3);
+    const references_array = new Float32Array(points * 2);
+    const birdVertex_array = new Float32Array(points);
 
     let v = 0;
 
     function verts_push(arg: number[]) {
       for (let i = 0; i < arg.length; i++) {
-        vertices.array[v++] = arg[i];
+        vertices_array[v++] = arg[i];
       }
     }
 
@@ -333,16 +326,26 @@ class BirdGeometry extends THREE.BufferGeometry {
 
       const c = new THREE.Color(0x444444 + (~~(v / 9) / BIRDS) * 0x666666);
 
-      birdColors.array[v * 3 + 0] = c.r;
-      birdColors.array[v * 3 + 1] = c.g;
-      birdColors.array[v * 3 + 2] = c.b;
+      birdColors_array[v * 3 + 0] = c.r;
+      birdColors_array[v * 3 + 1] = c.g;
+      birdColors_array[v * 3 + 2] = c.b;
 
-      references.array[v * 2] = x;
-      references.array[v * 2 + 1] = y;
+      references_array[v * 2] = x;
+      references_array[v * 2 + 1] = y;
 
-      birdVertex.array[v] = v % 9;
+      birdVertex_array[v] = v % 9;
     }
 
+    const vertices = new THREE.BufferAttribute(vertices_array, 3);
+    const birdColors = new THREE.BufferAttribute(birdColors_array, 3);
+    const references = new THREE.BufferAttribute(references_array, 2);
+    const birdVertex = new THREE.BufferAttribute(birdVertex_array, 1);
+
+    this.setAttribute("position", vertices);
+    this.setAttribute("birdColor", birdColors);
+    this.setAttribute("reference", references);
+    this.setAttribute("birdVertex", birdVertex);
+    // this.setAttribute( 'normal', new Float32Array( points * 3 ), 3 );
     this.scale(0.2, 0.2, 0.2);
   }
 }
