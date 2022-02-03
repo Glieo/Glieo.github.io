@@ -4,10 +4,6 @@ import {
   Variable,
 } from "three/examples/jsm/misc/GPUComputationRenderer.js";
 
-let mouseX = 0,
-  mouseY = 0;
-let windowHalfX = window.innerWidth / 2;
-let windowHalfY = window.innerHeight / 2;
 let last = performance.now();
 let gpuCompute: GPUComputationRenderer;
 let birdUniforms: {
@@ -130,7 +126,6 @@ uniform float separationDistance; // 20
 uniform float alignmentDistance; // 40
 uniform float cohesionDistance; //
 uniform float freedomFactor;
-uniform vec3 predator;
 
 const float width = resolution.x;
 const float height = resolution.y;
@@ -182,17 +177,15 @@ void main() {
 
   float limit = SPEED_LIMIT;
 
-  dir = predator * UPPER_BOUNDS - selfPosition;
-  dir.z = 0.;
-  // dir.z *= 0.6;
+
+  // move birds away from Ocean
+  dir = vec3( 0., -selfPosition.y, 0. );
   dist = length( dir );
   distSquared = dist * dist;
 
-  float preyRadius = 150.0;
+  float preyRadius = 30.0;
   float preyRadiusSq = preyRadius * preyRadius;
-
-
-  // move birds away from predator
+  
   if ( dist < preyRadius ) {
 
     f = ( distSquared / preyRadiusSq - 1.0 ) * delta * 100.;
@@ -280,9 +273,8 @@ void main() {
 }
 `;
 const WIDTH = 32;
-const BIRDS = WIDTH * WIDTH;
-const BOUNDS = 800,
-  BOUNDS_HALF = BOUNDS / 2;
+const BIRDS = 256;
+const BOUNDS = 800;
 class BirdGeometry extends THREE.BufferGeometry {
   constructor() {
     super();
@@ -394,7 +386,6 @@ function initComputeRenderer(renderer: THREE.WebGLRenderer) {
   velocityUniforms["alignmentDistance"] = { value: 1.0 };
   velocityUniforms["cohesionDistance"] = { value: 1.0 };
   velocityUniforms["freedomFactor"] = { value: 1.0 };
-  velocityUniforms["predator"] = { value: new THREE.Vector3() };
   velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed(2);
 
   velocityVariable.wrapS = THREE.RepeatWrapping;
@@ -410,11 +401,12 @@ function initComputeRenderer(renderer: THREE.WebGLRenderer) {
 }
 
 function fillPositionTexture(texture: THREE.DataTexture) {
+  const BOUNDS_HALF = BOUNDS / 2;
   const theArray = texture.image.data;
 
   for (let k = 0, kl = theArray.length; k < kl; k += 4) {
     const x = Math.random() * BOUNDS - BOUNDS_HALF;
-    const y = Math.random() * BOUNDS - BOUNDS_HALF;
+    const y = Math.random() * BOUNDS + 100;
     const z = Math.random() * BOUNDS - BOUNDS_HALF;
 
     theArray[k + 0] = x;
@@ -465,17 +457,6 @@ function initBirds(scene: THREE.Scene) {
   scene.add(birdMesh);
 }
 
-function onPointerMove(event: {
-  isPrimary: boolean;
-  clientX: number;
-  clientY: number;
-}) {
-  if (event.isPrimary === false) return;
-
-  mouseX = event.clientX - windowHalfX;
-  mouseY = event.clientY - windowHalfY;
-}
-
 function animate_Birds() {
   const now = performance.now();
   let delta = (now - last) / 1000;
@@ -490,15 +471,6 @@ function animate_Birds() {
   birdUniforms["time"].value = now;
   birdUniforms["delta"].value = delta;
 
-  velocityUniforms["predator"].value.set(
-    (0.5 * mouseX) / windowHalfX,
-    (-0.5 * mouseY) / windowHalfY,
-    0
-  );
-
-  mouseX = 10000;
-  mouseY = 10000;
-
   gpuCompute.compute();
 
   birdUniforms["texturePosition"].value =
@@ -507,13 +479,29 @@ function animate_Birds() {
     gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 }
 
+// 生成正态分布
+function normalRandom(mean: number, std: number) {
+  let u = 0.0,
+    v = 0.0,
+    w = 0.0,
+    c = 0.0;
+  do {
+    u = Math.random() * 2 - 1.0;
+    v = Math.random() * 2 - 1.0;
+    w = u * u + v * v;
+  } while (w == 0.0 || w >= 1.0);
+  c = Math.sqrt((-2 * Math.log(w)) / w);
+  let normal = mean + u * c * std;
+  return normal;
+}
+
 export function init_Birds(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
   initComputeRenderer(renderer);
   initBirds(scene);
   const effectController = {
-    separation: 20.0,
-    alignment: 20.0,
-    cohesion: 20.0,
+    separation: normalRandom(50, 20),
+    alignment: normalRandom(30, 10),
+    cohesion: normalRandom(30, 10),
     freedom: 0.75,
   };
   valuesChanger();
