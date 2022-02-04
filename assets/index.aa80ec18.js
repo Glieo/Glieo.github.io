@@ -173,7 +173,7 @@ void main() {
 
 
   // Attract flocks to the center
-  vec3 central = vec3( 0., 0., 0. );
+  vec3 central = vec3( 0., 100., 0. );
   dir = selfPosition - central;
   dist = length( dir );
 
