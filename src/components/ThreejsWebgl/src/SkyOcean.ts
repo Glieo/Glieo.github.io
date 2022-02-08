@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Water } from "three/examples/jsm/objects/Water.js";
 import { Sky } from "three/examples/jsm/objects/Sky.js";
-import waterUrl from "../assets/waternormals.jpg";
+import waterUrl from "./waternormals.jpg";
 let sky: Sky, water: Water, sun: THREE.Vector3;
 
 // Ocean

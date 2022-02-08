@@ -2,8 +2,8 @@
 import { onMounted } from "vue";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { init_SkyOcean } from "./SkyOcean";
-import { init_Birds } from "./Birds";
+import { init_SkyOcean } from "./src/SkyOcean";
+import { init_Birds } from "./src/Birds";
 
 let renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ThreeWebgl from "./components/ThreeWebgl.vue";
+import ThreejsWebgl from "./components/ThreejsWebgl/index.vue";
 </script>
 
 <template>
-  <ThreeWebgl />
+  <ThreejsWebgl />
 </template>
 
 <style>
