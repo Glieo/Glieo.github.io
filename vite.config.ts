@@ -8,10 +8,14 @@ export default defineConfig({
     vue(),
     VitePWA({
       includeAssets: [
-        "favicon.svg",
-        "favicon.ico",
         "robots.txt",
-        "apple-touch-icon.png",
+        "favicon.ico",
+        "browserconfig.xml",
+        "img/favicon.svg",
+        "img/favicon-16x16.png",
+        "img/favicon-32x32.png",
+        "img/mstile-150x150.png",
+        "img/apple-touch-icon.png",
       ],
       manifest: {
         name: "-o-",
@@ -20,17 +24,17 @@ export default defineConfig({
         theme_color: "#ffffff",
         icons: [
           {
-            src: "pwa-192x192.png",
+            src: "img/pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "pwa-512x512.png",
+            src: "img/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "pwa-512x512.png",
+            src: "img/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
